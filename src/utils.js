@@ -6,27 +6,28 @@ const BROWNLIST_CACHE_DURATION = 24 * 60 * 60 * 1000;
 
 let isFeces = {}
 
-function smellOutTheFeces(requirements, levels) {
-  let feces = []
+function smellOutTheFeces(pkg, levels) {
+  if (pkg.feces) return pkg.feces
+  pkg.feces = []
 
-  for (let name in requirements) {
+  for (let name in pkg.requires || {}) {
     let dependency = levels.map(deps => deps[name]).filter(dep => dep)[0]
     if (!dependency) throw new Error("Could not find installed dependency for: " + name + "@" + requirements[name])
 
-    let nestedFeces = smellOutTheFeces(
-        dependency.requires || [],
+    smellOutTheFeces(
+        dependency,
         [dependency.dependencies || {}].concat(levels))
 
-    if (isFeces[name] || nestedFeces.length > 0) {
-      feces.push({
+    if (isFeces[name] || dependency.feces.length > 0) {
+      pkg.feces.push({
         name: name,
         version: dependency.version,
-        dependencies: nestedFeces || []
+        dependencies: dependency.feces || []
       })
     }
   }
 
-  return feces
+  return pkg.feces
 }
 
 function showTheFeces(feces, notLast = []) {
@@ -105,11 +106,11 @@ function loadBrownList(callback, noDownload = false) {
     for (item of list) {
       if (item) isFeces[item] = true
     }
-    callback()
   }
   catch (e) {
-    callback(new Error("Error loading brownlist: " + e.message))
+    return callback(new Error("Error loading brownlist: " + e.message))
   }
+  callback()
 }
 
 function loadJson(filename) {

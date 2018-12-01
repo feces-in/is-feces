@@ -11,9 +11,9 @@ try {
 
   loadBrownList(error => {
     if (error) return printHelp(error)
-    
+
     console.log(packageFile.name + "@" + packageFile.version)
-    const feces = smellOutTheFeces(packageFile.dependencies, [lockFile.dependencies])
+    const feces = smellOutTheFeces({ requires: packageFile.dependencies }, [lockFile.dependencies])
     showTheFeces(feces)
     process.exit(feces.length)
   })
