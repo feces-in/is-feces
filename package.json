@@ -1,0 +1,20 @@
+{
+  "name": "is-feces",
+  "version": "0.3.0",
+  "description": "Find feces in your dependencies",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/feces-in/is-feces.git"
+  },
+  "homepage": "https://github.com/feces-in/is-feces#readme",
+  "main": "src/is-feces.js",
+  "scripts": {},
+  "bin": {
+    "is-feces": "./src/is-feces.js"
+  },
+  "author": "fecesinside@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-colors": "^3.2.1"
+  }
+}
