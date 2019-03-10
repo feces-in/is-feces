@@ -12,7 +12,7 @@ function smellOutTheFeces(pkg, levels) {
 
   for (let name in pkg.requires || {}) {
     let dependency = levels.map(deps => deps[name]).filter(dep => dep)[0]
-    if (!dependency) throw new Error("Could not find installed dependency for: " + name + "@" + requirements[name])
+    if (!dependency) throw new Error("Could not find installed dependency for: " + name + "@" + pkg.requires[name])
 
     smellOutTheFeces(
         dependency,
@@ -30,7 +30,7 @@ function smellOutTheFeces(pkg, levels) {
   return pkg.feces
 }
 
-function showTheFeces(feces, notLast = []) {
+function showTheFeces(feces, notLast = [], parentFeces = {}) {
   if (feces.length == 0) {
     console.log("└─ No feces found!")
   }
@@ -40,13 +40,18 @@ function showTheFeces(feces, notLast = []) {
     let faeces = feces[i]
     notLast[notLast.length-1] = i < feces.length-1
 
+    let fullName = faeces.name + "@" + faeces.version
+    if (parentFeces[fullName]) {
+      console.log(padding(notLast), colors.gray(fullName), " (circular)")
+      continue
+    }
     console.log(padding(notLast),
      isFeces[faeces.name]
-     ? colors.white(faeces.name + "@" + faeces.version + " 💩💩💩")
-     : colors.gray(faeces.name + "@" + faeces.version))
+     ? colors.white(fullName + " 💩💩💩")
+     : colors.gray(fullName))
 
     if (faeces.dependencies.length > 0)
-      showTheFeces(faeces.dependencies, notLast)
+      showTheFeces(faeces.dependencies, notLast, Object.assign({ [fullName]: true }, parentFeces))
   }
 }
 
